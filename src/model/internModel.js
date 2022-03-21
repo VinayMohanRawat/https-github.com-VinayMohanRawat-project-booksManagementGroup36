@@ -21,9 +21,14 @@ const internSchema = new mongoose.Schema({
           }
     },
     mobile: {
-        type: String,
+        type: Number,
         required: true,
         unique: true,
+        minLength:[10, "length is shorter than the minimum allowed length (10)."],
+        maxLength:[10, "length is greater than the maximum allowed length (10)."]
+
+        
+
         
     },
     collegeId: {

@@ -8,7 +8,7 @@ const internController = require("../controllers/internController.js")
 router.post('/functionUp/Colleges', collegeController.createCollage);
 
 // API FOR INTERN CREATION
-//router.post('/functionup/interns', internController.internCreate);
+router.post('/functionUp/interns', internController.internCreate);
 
 
 

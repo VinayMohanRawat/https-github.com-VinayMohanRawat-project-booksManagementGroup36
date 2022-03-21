@@ -28,10 +28,10 @@ const createCollage = async function (req, res) {
     }
 
     let collageData = await collageModel.create(data)
-    res.status(201).send({ status:true,data: collageData })
+    return res.status(201).send({ status:true,data: collageData })
   }
   catch (error) {
-    res.status(500).send({ msg: error.message })
+    return res.status(500).send({ msg: error.message })
   }
 }
 
