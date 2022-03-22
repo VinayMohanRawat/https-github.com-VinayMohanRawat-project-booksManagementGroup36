@@ -13,7 +13,7 @@ const internSchema = new mongoose.Schema({
         trim: true,
         lowercase: true,
         unique: true,
-        required: 'Email address is required',
+        required: [true,'Email address is required'],
         validate: {
             validator: validator.isEmail,
             message: '{VALUE} is not a valid email',
@@ -23,6 +23,8 @@ const internSchema = new mongoose.Schema({
 
     mobile: {
         type: Number,
+        required:[true,"mobile no required"],
+        unique:true,
         validate: {
             validator: function (mobile) {
                 return /^[6-9]\d{9}$/.test(mobile)

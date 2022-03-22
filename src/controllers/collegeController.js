@@ -40,14 +40,6 @@ const createCollage = async function (req, res) {
 
 
 
-// const getCollegeDetails = async function(req,res){
-//   let getData = req.query.name
- 
-//   const getDetails = await collageModel.find({name: getData})
-//   return res.status(200).send({status:true, data : getDetails})
-// }
-
-
 let getCollegeDetails = async function (req, res) {
   try {
 
@@ -72,8 +64,9 @@ let getCollegeDetails = async function (req, res) {
     let internsDetails = await internModel.find({ collegeId: id, isDeleted: false }).select({ _id: 1, name: 1, email: 1, mobile: 1 })
 
     collageDetails.interests = internsDetails
-    res.status(200).send({ status: true, data: collageDetails })
-
+    if(collageDetails.interests.length <= 0){
+      return res.status(404).send({ERROR:`No Interns Are Avilable For ${collageName} College`})}
+    
   }
   catch (error) {
     res.status(500).send({ msg: error.message })
