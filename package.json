@@ -22,6 +22,8 @@
     "express": "^4.17.1",
     "mongoose": "^5.12.9",
     "nodemon": "^2.0.15",
+    "phone-number-validation": "^0.3.1",
+    "request": "^2.88.2",
     "validator": "^13.7.0",
     "yup-phone": "^1.3.2"
   }

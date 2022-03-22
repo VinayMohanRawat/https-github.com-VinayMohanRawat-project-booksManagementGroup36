@@ -14,23 +14,24 @@ const internSchema = new mongoose.Schema({
         lowercase: true,
         unique: true,
         required: 'Email address is required',
-        validate:{
+        validate: {
             validator: validator.isEmail,
             message: '{VALUE} is not a valid email',
             isAsync: false
-          }
+        }
     },
+
     mobile: {
         type: Number,
-        required: true,
-        unique: true,
-        minLength:[10, "length is shorter than the minimum allowed length (10)."],
-        maxLength:[10, "length is greater than the maximum allowed length (10)."]
-
-        
-
-        
+        validate: {
+            validator: function (mobile) {
+                return /^[6-9]\d{9}$/.test(mobile)
+            },
+            message: 'Please fill a valid mobile number',
+            isAsync: false
+        }
     },
+
     collegeId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'College',
