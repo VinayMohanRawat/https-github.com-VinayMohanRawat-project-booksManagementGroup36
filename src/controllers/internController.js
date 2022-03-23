@@ -1,7 +1,6 @@
 
 const collegeModel = require("../model/collegeModel")
 const internModel = require("../model/internModel")
-//const validator = require('validator');  
 const mongoose = require('mongoose')
 
 
@@ -29,9 +28,9 @@ const internCreate = async function (req, res) {
         if (sameEmail)
             return res.status(400).send({ status: false, msg: "email already present" })
 
-        // if (!(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(data.email))) {
-        //   return res.status(400).send({ status: false, message: " provide valid email address " })
-        // }
+        if (!(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(data.email))) {
+          return res.status(400).send({ status: false, message: " provide valid email address " })
+        }
 
         if (!(data.mobile)) {
             return res.status(400).send({ status: false, msg: "mobile number required" })
@@ -56,6 +55,10 @@ const internCreate = async function (req, res) {
             return res.status(404).send({ status: false, message: "collageId not found" })
         }
         const internCreate = await internModel.create(data)
+        if (internCreate.isDeleted !== false) {
+            return res.status(400).send({ status: false, msg: "isDeleted must be false" })
+          }
+      
         res.status(201).send({ status: true, data: internCreate })
 
     } catch (error) {

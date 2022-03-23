@@ -8,6 +8,7 @@ const isValidRequestBody = function (data) {
 
 
 
+
 const createCollage = async function (req, res) {
   try {
     let  data = req.body
@@ -17,6 +18,7 @@ const createCollage = async function (req, res) {
     if (!(data.name)) {
       return res.status(400).send({ status: false, msg: "name required" })
     }
+    
     if (!(data.fullName)) {
       return res.status(400).send({ status: false, msg: "fullName is required" })
     }
@@ -29,6 +31,10 @@ const createCollage = async function (req, res) {
     }
 
     let collageData = await collageModel.create(data)
+    if (collageData.isDeleted !== false) {
+      return res.status(400).send({ status: false, msg: "isDeleted must be false" })
+    }
+
     return res.status(201).send({ status:true,data: collageData })
   }
   catch (error) {
@@ -64,9 +70,11 @@ let getCollegeDetails = async function (req, res) {
     let internsDetails = await internModel.find({ collegeId: id, isDeleted: false }).select({ _id: 1, name: 1, email: 1, mobile: 1 })
 
     collageDetails.interests = internsDetails
-    if(collageDetails.interests.length <= 0){
-      return res.status(404).send({ERROR:`No Interns Are Avilable For ${collageName} College`})}
     
+
+    if(collageDetails.interests.length <= 0){
+      return res.status(404).send({ERROR:`No Interns Are Available For ${collageName} College`})}
+      return res.status(200).send({status:true, data: collageDetails})
   }
   catch (error) {
     res.status(500).send({ msg: error.message })
