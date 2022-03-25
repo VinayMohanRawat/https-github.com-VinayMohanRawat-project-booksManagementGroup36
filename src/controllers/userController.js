@@ -47,14 +47,14 @@ const registerUser = async function (req, res) {
       return res.status(400).send({ status: false, message: "Please mention valid Phone Number" })
     }
 
-    let duplicatePhone=await userModel.findOne({phone})
-    if(duplicatePhone){return res.status(401).send({status:false,message:"phone number already exist"})}
+    let duplicatePhone = await userModel.findOne({ phone })
+    if (duplicatePhone) { return res.status(401).send({ status: false, message: "phone number already exist" }) }
 
 
     if (!email) { return res.status(400).send({ status: false, message: "Email is require" }) }
-    let duplicateEmail=await userModel.findOne({email})
-    if(duplicateEmail){return res.status(401).send({status:false,message:"email already exist"})}
-    
+    let duplicateEmail = await userModel.findOne({ email })
+    if (duplicateEmail) { return res.status(401).send({ status: false, message: "email already exist" }) }
+
     if (!(/^\w+([\.-]?\w+)@\w+([\.-]?\w+)(\.\w{2,3})+$/).test(email)) {
       return res.status(400).send({ status: false, message: "Please mention valid Email" })
     }
@@ -125,7 +125,7 @@ const login = async function (req, res) {
     const token = jwt.sign({
       userId: user._id,
       iat: Math.floor(Date.now() / 1000),
-      exp: Math.floor(Date.now() / 1000) +(60 * 60)/2
+      exp: Math.floor(Date.now() / 1000) + (60 * 60) / 2
     },
       "room_no-36"
     )
