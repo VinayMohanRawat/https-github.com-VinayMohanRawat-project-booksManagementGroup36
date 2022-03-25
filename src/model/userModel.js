@@ -30,7 +30,7 @@ const userSchema = new mongoose.Schema({
         unique : [true , "email should be Unique"],
         validate : {
                     validator : validator.isEmail,
-                    message : "{value} is not a valid email",
+                    message : `email is not a valid email`,          
                     isAsync : true    
                     }
     }, 
@@ -44,9 +44,26 @@ const userSchema = new mongoose.Schema({
     address: {
       street: {type : String, trim : true},
       city: {type : String, trim : true},
-      pincode: {type : Number}
+      pincode: {type : String}
     },
        
 }, { timestamps: true });
 
 module.exports = mongoose.model("User", userSchema)
+
+
+/**
+{
+    "title":"Mr",
+    "name":"Manish Kumar",
+    "phone" : "809809890909",
+    "email" : "m@gmail.com",
+    "password":"manish124",
+    "address":  {
+    "street" : "Sector 17",
+    "city" : "New Delhi",
+    "pincode" : "110001"
+                }
+}
+
+**/
