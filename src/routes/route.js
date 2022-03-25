@@ -1,9 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const collegeController = require("../controllers/collegeController")
+const userController = require("../controllers/collegeController")
 const internController = require("../controllers/internController.js")
 
 
+router.post('/register', collegeController.createCollage);
 router.post('/functionUp/Colleges', collegeController.createCollage);
 
 

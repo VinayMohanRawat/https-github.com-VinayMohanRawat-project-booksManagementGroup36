@@ -11,9 +11,11 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 const mongoose = require('mongoose')
 
-mongoose.connect("mongodb+srv://groupXDatabase:DrGlqGI9nfo7DKJs@cluster0.3tu2j.mongodb.net/groupXDatabase1?retryWrites=true&w=majority", {useNewUrlParser: true,useUnifiedTopology: true,  useCreateIndex: true}
+mongoose.connect(
+    "mongodb+srv://booksManagementGroupX:B585MD3Oj7zq7y9i@cluster0.3babg.mongodb.net/booksManagement?retryWrites=true&w=majority", 
+    {useNewUrlParser: true,useUnifiedTopology: true,  useCreateIndex: true}
 )
-    .then(() => console.log('mongodb running on 3000....'))
+    .then(() => console.log('mongodb is connected'))
     .catch(err => console.log(err))
 
 app.use('/', route);
