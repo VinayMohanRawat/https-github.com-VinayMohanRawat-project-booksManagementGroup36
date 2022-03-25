@@ -1,4 +1,4 @@
-
+const jwt = require('jsonwebtoken')
 const userModel= require("../model/userModel")
 
 const isValid = function(value){
@@ -34,9 +34,9 @@ const registerUser = async function(req,res){
     }
 
     if(!isValid(name)){ return res.status(400).send({status:false, message : "Name is Require"}) }
-    // if(!(/^[a-zA-Z\-]+$/).test(name)) {
-    //   return res.status(400).send({status:false, message : "Please mention valid Name"})
-    // }
+    if(!(/^[A-Za-z\s]+$/).test(name)) {
+      return res.status(400).send({status:false, message : "Please mention valid Name"})
+    }
 
     if(typeof name !== 'string'){ return res.status(400).send({status:false, message : "Name should be String"})}
 
@@ -77,7 +77,7 @@ const registerUser = async function(req,res){
     
 
     const createUser = await userModel.create(requestBody)
-
+    
     res.status(201).send({status:true,  message: 'Success', data:createUser})
 
 
@@ -87,8 +87,53 @@ const registerUser = async function(req,res){
   }
 }
 
+const login = async function(req, res){
+try{
 
+let requestBody = req.body;
+
+if (!isValidRequestBody(requestBody)) return res.status(400).send({status:false, msg:"email and password must be required"})
+
+const {email,password} = requestBody;
+
+if(!email){ return res.status(400).send({status:false, message : "email is required"})}
+
+if(!(/^\w+([\.-]?\w+)@\w+([\.-]?\w+)(\.\w{2,3})+$/).test(email)) {
+  return res.status(400).send({status:false, message : "please enter valid email in required field"})
+}
+if(!password){ return res.status(400).send({status:false, message : "Password is require"})}
+    if(password.length < 8 || password.length > 15){ 
+      return res.status(400).send({status:false, message :"Password length should not be less than 8 and greater than 15" })
+    }
+
+const user = await userModel.findOne({email,password})
+
+if (!email) return res.status(404).send({status:false,msg:"email must be present in body"})
+if(!password) return res.status(404).send({status:false,msg:"password must be present in body"})
+
+if (!user) return  res.status(401).send({status:false,msg:"invalid crendential"})
+
+const token = jwt.sign({
+  userId:user._id,
+  iat : Math.floor(Date.now()/1000),
+  exp : Math.floor(Date.now()/1000)+10*60*60},
+  "room_no-36"
+) 
+
+res.header("x-api-key", token)
+
+res.status(200).send({status:true,msg:"userLogin successfully",data:token})
+
+} catch (err){
+res.status(500).send({status:false,msg:err.message})
+
+}
+
+
+
+}
 
 module.exports.registerUser = registerUser
+module.exports.login =login
 
 
