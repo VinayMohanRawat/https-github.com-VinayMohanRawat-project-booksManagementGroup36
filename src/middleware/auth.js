@@ -3,7 +3,9 @@ const jwt = require("jsonwebtoken")
 let validUser = function (req, res, next) {
     try {
         let userId = req.body.userId
-
+        // if(!userId) userId = req.query.userId
+        // if (!userId) userId = req.params.userId
+    
         let token = req.headers['X-Api-Key']
         if (!token) {
             token = req.headers['x-api-key']
@@ -12,11 +14,17 @@ let validUser = function (req, res, next) {
             return res.status(401).send({ status: false, message: "token required" })
         }
 
+        
+        let decodedToken = jwt.verify(token, 'room_no-36')
+
+        if(!userId) userId = decodedToken.userId
+            
+        
         if (!userId) {
             return res.status(400).send({ status: false, msg: "UserId required" })
         }
-        let decodedToken = jwt.verify(token, 'room_no-36')
 
+         
         // if (decodedToken.exp) {
         //     return res.status(401).send({ status: false, message: "Token expired" })
         // }

@@ -12,6 +12,8 @@ router.post('/login', userController.login);
 
 router.post('/books',middleware.validUser,bookController.createBook)
 
+router.get('/books',middleware.validUser,bookController.getBooks)
+
 
 
 
