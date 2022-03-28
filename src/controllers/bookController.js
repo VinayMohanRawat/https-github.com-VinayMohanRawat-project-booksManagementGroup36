@@ -112,12 +112,13 @@ const getBooks = async function (req, res) {
         }
 
 
-        const books = await bookModel.find(bookQuery).select({ _id: 1, title: 1, excerpt: 1, userId: 1, category: 1, releasedAt: 1, reviews: 1 })
+        const books = await bookModel.find(bookQuery)
+            .select({ _id: 1, title: 1, excerpt: 1, userId: 1, category: 1, releasedAt: 1, reviews: 1 })
             .sort({ title: -1 })
         console.log(books)
 
-        if (Array.isArray(books) && books.length === 0) {                          //data comes in array
-            return res.status(404).send({ status: false, message: "no book exist" })
+        if (Array.isArray(books) && books.length === 0) {                          //Books data comes in array
+            return res.status(404).send({ status: false, message: "No Book Exist" })
         }   //(Array.isArray(book)) it represent data in array or not
 
         res.status(200).send({ status: true, data: books })
@@ -132,8 +133,42 @@ const getBooks = async function (req, res) {
 
 
 
-module.exports.createBook = createBook
-module.exports.getBooks = getBooks
+const deleteBook = async function (req, res) {
+
+    try {
+        const getBookId = req.params.bookId
+
+        const deletedDate = moment().format("YYYY-MM-DD[T]HH:mm:ss")
+
+        if(!isValidRequestBody(getBookId)) {
+            return res.status(400).send({status:false, message :"Invalid request parameters. Please provide bookId"})
+        }
+
+        if (!validObjectId(getBookId)) {
+            return res.status(400).send({ status: false, message: "Invalid bookId." })
+        }        
+
+
+       const checkBookIdIsDeleted = await bookModel.findOne({_id:getBookId, isDeleted:false})
+
+       if(!checkBookIdIsDeleted){return res.status(404).send({status:false, message:`This (${getBookId}) bookId is not exist`})}
+
+       const bookIdDeleted = await bookModel.findByIdAndUpdate(getBookId , {isDeleted : true, deletedAt : deletedDate})
+
+        res.status(200).send({status:true, message : `This (${getBookId}) bookId is Deleted Successfully`})
+        
+        }
+    catch (error) {
+            return res.status(500).send({ ERROR: error.message })
+        }
+    }
+
+
+
+
+    module.exports.createBook = createBook
+    module.exports.getBooks = getBooks
+    module.exports.deleteBook = deleteBook
 
 
 
@@ -147,3 +182,12 @@ module.exports.getBooks = getBooks
 
          // let varifySubCategory = await bookModel.findOne({subcategory:subcategory })
         // if (!varifySubCategory) { return res.status(404).send({ status: false, message: "Subcategory not found" }) }
+
+
+
+
+
+
+
+
+

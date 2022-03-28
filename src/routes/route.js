@@ -17,6 +17,10 @@ router.get('/books',middleware.validUser,bookController.getBooks)
 router.get('/books',middleware.validUser,bookController.getBooks)
 
 
+router.delete('/books/:bookId',bookController.deleteBook)
+
+
+
 
 
 
