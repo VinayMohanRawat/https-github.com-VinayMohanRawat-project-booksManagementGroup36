@@ -1,11 +1,13 @@
 const jwt = require("jsonwebtoken")
+const mongoose = require('mongoose')
 
 let validUser = function (req, res, next) {
     try {
         let userId = req.body.userId
-        // if(!userId) userId = req.query.userId
-        // if (!userId) userId = req.params.userId
-    
+
+        // if (!(mongoose.Types.ObjectId.isValid(userId))) { return res.status(400).send({ status: false, message: "Invalid userId" }) }
+
+
         let token = req.headers['X-Api-Key']
         if (!token) {
             token = req.headers['x-api-key']
@@ -14,17 +16,17 @@ let validUser = function (req, res, next) {
             return res.status(401).send({ status: false, message: "token required" })
         }
 
-        
+
         let decodedToken = jwt.verify(token, 'room_no-36')
 
-        if(!userId) userId = decodedToken.userId
-            
-        
+        if (!userId) userId = decodedToken.userId
+
+
         if (!userId) {
             return res.status(400).send({ status: false, msg: "UserId required" })
         }
 
-         
+
         // if (decodedToken.exp) {
         //     return res.status(401).send({ status: false, message: "Token expired" })
         // }
@@ -32,7 +34,7 @@ let validUser = function (req, res, next) {
             return res.status(401).send({ status: false, message: "token is invalid" })
         }
         if (decodedToken.userId != userId) {
-            res.status(403).send({ status: false, msg: "Unauthorized access" })
+            return res.status(403).send({ status: false, msg: "Unauthorized access" })
         }
 
         next()

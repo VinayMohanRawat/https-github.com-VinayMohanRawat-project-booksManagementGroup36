@@ -14,6 +14,8 @@ router.post('/books',middleware.validUser,bookController.createBook)
 
 router.get('/books',middleware.validUser,bookController.getBooks)
 
+router.get('/books',middleware.validUser,bookController.getBooks)
+
 
 
 

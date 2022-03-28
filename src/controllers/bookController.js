@@ -1,7 +1,8 @@
 const bookModel = require("../model/booksModel")
 const userModel = require('../model/userModel')
 const mongoose = require('mongoose')
-let moment=require("moment")
+let moment = require("moment")
+const { format } = require("express/lib/response")
 
 const isValid = function (value) {
     if (typeof value === "undefined" || value === null) return false
@@ -15,8 +16,12 @@ const isValidRequestBody = function (requestBody) {
 }
 
 const validObjectId = function (ObjectId) {
-    return mongoose.Types.ObjectId(ObjectId)
+    return mongoose.Types.ObjectId.isValid(ObjectId)
 }
+// const isObjectId = function (isObjectId) {
+//     let result = ObjectId.isValid(isObjectId)
+//     return result
+// }
 
 
 const createBook = async function (req, res) {
@@ -44,7 +49,7 @@ const createBook = async function (req, res) {
             return res.status(400).send({ status: false, message: "Invalid userId" })
         }
 
-        let user_id = await userModel.find({userId} )
+        let user_id = await userModel.find({ userId })
         if (!user_id) {
             return res.status(404).send({ status: false, message: "User not found in user collection" })
         }
@@ -60,10 +65,10 @@ const createBook = async function (req, res) {
 
         if (!isValid(reviews)) { return res.status(400).send({ status: false, message: "Reviews is required" }) }
 
-        if (!releasedAt) { return res.status(400).send({ status: false, message: "ReleasedAt is required" }) }
-        let Date = moment().format("YYYY-MM-DD[T]HH:mm:ss")
-        req.body.releasedAt = Date
-
+        if (!isValid(releasedAt)) { return res.status(400).send({ status: false, message: "ReleasedAt is required" }) }
+        // let Date = moment().format("YYYY-MM-DD")
+        // req.body.releasedAt = Date
+        // if(releasedAt!==("YYYY-MM-DD")){return res.status(400).send({status:false,message:"realesedAt date format must be YYYY-MM-DD"})}
 
         const createBook = await bookModel.create(requestBody)
 
@@ -76,55 +81,50 @@ const createBook = async function (req, res) {
 }
 
 
-const getBooks = async function(req, res){
-    try{
+const getBooks = async function (req, res) {
+    try {
 
-const bookQuery = {isDeleted :false}
+        const bookQuery = { isDeleted: false }
+        const QueryParam = req.query
+        if (!isValidRequestBody(QueryParam)) {
+            const booksNotDeleted = await bookModel.find({ isDeleted: false })
+                .select({ _id: 1, title: 1, excerpt: 1, userId: 1, category: 1, releasedAt: 1, reviews: 1 })
+                .sort({ title: -1 })
 
-const QueryParam = req.query
-if(!QueryParam) {
-    const booksNotDeleted = await bookModel.find({isDeleted:false})
-    .select({_id:1,title:1,excerpt:1,userId:1,category:1,relesedAt:1,reviews:1})
-    .sort({title:-1})
-    console.log(booksNotDeleted)
-    return res.status(200).send({status:true, data:booksNotDeleted})
-}
-if(isValidRequestBody(QueryParam)) {
+            console.log(booksNotDeleted)
+            return res.status(200).send({ status: true, data: booksNotDeleted })
+        }
 
-const {userId , category, subcategory} = QueryParam
+        const { userId, category, subcategory } = QueryParam
 
-if (isValid(userId) && validObjectId(userId)){
-
-bookQuery["userId"] = userId
-
-}
-if(isValid(category)){
-
-    bookQuery["category"] =category.trim();
-}
-
-if(isValid(subcategory)) {
-
-    bookQuery["subcategory"] = subcategory.trim()
-}
+        if (isValid(userId)) {
+            bookQuery["userId"] = userId
+        }
 
 
-const books = await bookModel.find(bookQuery).select({_id:1,title:1,excerpt:1,userId:1,category:1,relesedAt:1,reviews:1})
-.sort({title:-1})
-console.log(books)
-
-if (!isValid(books)) return res.status(404).send({status:false,msg:"no such books are available in Db"})
-
-res.status(200).send({status:true, data:books})
-
-}
+        if (isValid(category)) {
+            bookQuery["category"] = category.trim();
+        }
 
 
+        if (isValid(subcategory)) {
+            bookQuery["subcategory"] = subcategory.trim()
+        }
 
 
-    } catch(err){
-        res.status(500).send({status:false,msg:err.message})
-    } 
+        const books = await bookModel.find(bookQuery).select({ _id: 1, title: 1, excerpt: 1, userId: 1, category: 1, releasedAt: 1, reviews: 1 })
+            .sort({ title: -1 })
+        console.log(books)
+
+        if (Array.isArray(books) && books.length === 0) {                          //data comes in array
+            return res.status(404).send({ status: false, message: "no book exist" })
+        }   //(Array.isArray(book)) it represent data in array or not
+
+        res.status(200).send({ status: true, data: books })
+
+    } catch (err) {
+        res.status(500).send({ status: false, msg: err.message })
+    }
 }
 
 
@@ -133,4 +133,17 @@ res.status(200).send({status:true, data:books})
 
 
 module.exports.createBook = createBook
-module.exports.getBooks= getBooks
+module.exports.getBooks = getBooks
+
+
+
+
+ // if (!validObjectId(userId)) { return res.status(400).send({ status: false, message: "Invalid Userid" }) }
+// let user_id = await userModel.findOne({ _id: userId })
+        // if (!user_id) { return res.status(404).send({ status: false, message: "user id not found" }) }
+
+         // let varifyCategory = await bookModel.findOne({category:category })
+        // if (!varifyCategory) { return res.status(404).send({ status: false, message: "category not found" }) }
+
+         // let varifySubCategory = await bookModel.findOne({subcategory:subcategory })
+        // if (!varifySubCategory) { return res.status(404).send({ status: false, message: "Subcategory not found" }) }

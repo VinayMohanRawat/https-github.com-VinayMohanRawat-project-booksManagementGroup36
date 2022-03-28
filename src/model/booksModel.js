@@ -30,7 +30,7 @@ const booksSchema = new mongoose.Schema({
          trim:true
         },
     subcategory: {
-        type:[String],
+        type:String,
          required:true,
          trim:true
         },
@@ -50,9 +50,9 @@ const booksSchema = new mongoose.Schema({
     
     releasedAt: {
         type:Date,
-        Date : moment().format("YYYY-MM-DD[T]HH:mm:ss"),
-         required:true
-
+        // Date : moment().format("YYYY-MM-DD"),
+         required:true,
+         trim:true
         }
    
 }, { timestamps: true })
