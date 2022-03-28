@@ -18,7 +18,7 @@ const userSchema = new mongoose.Schema({
         unique: [true, "Phone No. should be Unique"],
         validate: {
             validator: function (phone) {
-                return /^[6-9]\d{9}$/.test(phone)
+                return /^(?:(?:\+|0{0,2})91(\s*[\-]\s*)?|[0]?)?[6789]\d{9}$/.test(phone)
             },
             message: "Please fill valid phone number",
             isAsync: false

@@ -28,7 +28,7 @@ const registerUser = async function (req, res) {
     const { title, name, phone, email, password, address } = requestBody
 
     const { street, city, pincode } = address
-
+    if (!isValid(title)) { return res.status(400).send({ status: false, message: "title is Require" }) }
     if (!isValidTitle(title)) {
       return res.status(400).send({ status: false, message: "Title Should be one of Mr, Mrs, Miss" })
     }
@@ -41,7 +41,7 @@ const registerUser = async function (req, res) {
     if (typeof name !== 'string') { return res.status(400).send({ status: false, message: "Name should be String" }) }
 
 
-    if (!phone) { return res.status(400).send({ status: false, message: "Phone No. is require" }) }
+    if (!isValid(phone)) { return res.status(400).send({ status: false, message: "Phone No. is require" }) }
 
     if (!(/^(?:(?:\+|0{0,2})91(\s*[\-]\s*)?|[0]?)?[6789]\d{9}$/).test(phone)) {
       return res.status(400).send({ status: false, message: "Please mention valid Phone Number" })
@@ -51,7 +51,7 @@ const registerUser = async function (req, res) {
     if (duplicatePhone) { return res.status(401).send({ status: false, message: "phone number already exist" }) }
 
 
-    if (!email) { return res.status(400).send({ status: false, message: "Email is require" }) }
+    if (!isValid(email)) { return res.status(400).send({ status: false, message: "Email is require" }) }
     let duplicateEmail = await userModel.findOne({ email })
     if (duplicateEmail) { return res.status(401).send({ status: false, message: "email already exist" }) }
 
@@ -59,7 +59,7 @@ const registerUser = async function (req, res) {
       return res.status(400).send({ status: false, message: "Please mention valid Email" })
     }
 
-    if (!password) { return res.status(400).send({ status: false, message: "Password is require" }) }
+    if (!isValid(password)) { return res.status(400).send({ status: false, message: "Password is require" }) }
     if (password.length < 8 || password.length > 15) {
       return res.status(400).send({ status: false, message: "Password length should not be less than 8 and greater than 15" })
     }
