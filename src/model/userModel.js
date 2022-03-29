@@ -5,7 +5,8 @@ const userSchema = new mongoose.Schema({
     title: {
         type: String,
         required: [true, "Title is require"],
-        enum: ['Mr', 'Mrs', 'Miss']
+        enum: ['Mr', 'Mrs', 'Miss'],
+        trim:true
     },
     name: {
         type: String,
@@ -14,7 +15,7 @@ const userSchema = new mongoose.Schema({
     },
     phone: {
         type: String,
-        require: [true, "Phone Number is require"],
+        required: [true, "Phone Number is require"],
         unique: [true, "Phone No. should be Unique"],
         validate: {
             validator: function (phone) {
@@ -31,7 +32,7 @@ const userSchema = new mongoose.Schema({
         validate: {
             validator: validator.isEmail,
             message: `email is not a valid email`,
-            isAsync: true
+            isAsync: false
         }
     },
     password: {

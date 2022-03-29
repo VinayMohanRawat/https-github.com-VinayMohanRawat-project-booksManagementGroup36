@@ -107,13 +107,9 @@ const login = async function (req, res) {
 
     if (!email) { return res.status(400).send({ status: false, message: "email is required" }) }
 
-    // if (!(/^\w+([\.-]?\w+)@\w+([\.-]?\w+)(\.\w{2,3})+$/).test(email)) {
-    //   return res.status(400).send({ status: false, message: "please enter valid email in required field" })
-    // }
+
     if (!password) { return res.status(400).send({ status: false, message: "Password is require" }) }
-    // if (password.length < 8 || password.length > 15) {
-    //   return res.status(400).send({ status: false, message: "Password length should not be less than 8 and greater than 15" })
-    // }
+
 
     const user = await userModel.findOne({ email, password })
 
