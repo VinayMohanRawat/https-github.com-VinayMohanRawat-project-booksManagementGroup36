@@ -2,7 +2,7 @@ const bookModel = require("../model/booksModel")
 const userModel = require('../model/userModel')
 const mongoose = require('mongoose')
 let moment = require("moment")
-const { format } = require("express/lib/response")
+
 
 const isValid = function (value) {
     if (typeof value === "undefined" || value === null) return false
@@ -80,8 +80,9 @@ const createBook = async function (req, res) {
 const getBooks = async function (req, res) {
     try {
 
-        const bookQuery = { isDeleted: false }
+
         const QueryParam = req.query
+        const { userId, category, subcategory } = QueryParam
         if (!isValidRequestBody(QueryParam)) {
             const booksNotDeleted = await bookModel.find({ isDeleted: false })
                 .select({ _id: 1, title: 1, excerpt: 1, userId: 1, category: 1, releasedAt: 1, reviews: 1 })
@@ -91,31 +92,18 @@ const getBooks = async function (req, res) {
             return res.status(200).send({ status: true, data: booksNotDeleted })
         }
 
-        const { userId, category, subcategory } = QueryParam
-
-        if (isValid(userId))
-            bookQuery["userId"] = userId
-
-
-
-        if (isValid(category)) {
-            bookQuery["category"] = category.trim();
-        }
-
-
-        if (isValid(subcategory)) {
-            const subcat = subcategory.trim().split(',').map(subcat => subcat.trim())
-            bookQuery["subcategory"] = { $all: subcat }
-        }
-
-
-        const books = await bookModel.find(bookQuery)
+        const books = await bookModel
+            .find({
+                $or: [{ userId: userId, category: category },
+                { userId: userId, subcategory: subcategory },
+                { category: category, subcategory: subcategory }]
+            })
             .select({ _id: 1, title: 1, excerpt: 1, userId: 1, category: 1, releasedAt: 1, reviews: 1 })
             .sort({ title: 1 })
-        console.log(books)
+
 
         if (Array.isArray(books) && books.length === 0) {                          //Books data comes in array
-            return res.status(404).send({ status: false, message: "No Book Exist" })
+            return res.status(404).send({ status: false, message: "No Book Exist, Please try combinations" })
         }   //(Array.isArray(book)) it represent data in array or not
 
         res.status(200).send({ status: true, data: books })
