@@ -121,7 +121,7 @@ const getBooksData = async function (req, res) {
         const getBookDetail = await bookModel.findOne({ _id: bookId })
 
         if (!getBookDetail) return res.status(404).send({ status: false, msg: "bookId is must be present" })
-
+ 
         const newBook = {
             _id: getBookDetail._id,
             title: getBookDetail.title,
@@ -134,7 +134,7 @@ const getBooksData = async function (req, res) {
             releasedAt: getBookDetail.releasedAt
 
         }
-        newBook.reviewsData = []
+        newBook.reviewsData =
         console.log(newBook)
 
         res.status(200).send({ status: true, data: newBook })

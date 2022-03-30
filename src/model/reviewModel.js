@@ -25,7 +25,7 @@ let reviewSchema = new mongoose.Schema({
     },
     review: {
         type: String,
-        optional: true
+        
     },
     isDeleted: {
         type: Boolean,
