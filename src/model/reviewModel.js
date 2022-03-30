@@ -10,12 +10,12 @@ let reviewSchema = new mongoose.Schema({
     reviewedBy: {
         type: String,
         required: true,
-        default: 'Guest'
-        
+        default: 'Guest',
+        trim:true 
     },
     reviewedAt: {
         type: Date,
-        required: true
+        default:Date.now()
     },
     rating: {
         type: Number,
@@ -25,7 +25,7 @@ let reviewSchema = new mongoose.Schema({
     },
     review: {
         type: String,
-        
+        trim:true
     },
     isDeleted: {
         type: Boolean,
@@ -35,3 +35,4 @@ let reviewSchema = new mongoose.Schema({
 
 
 module.exports = mongoose.model("Reviews", reviewSchema)
+

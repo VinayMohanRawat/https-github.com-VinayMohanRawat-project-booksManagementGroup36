@@ -16,6 +16,7 @@ const isValidRequestBody = function (requestBody) {
   return Object.keys(requestBody).length > 0
 }
 
+
 const registerUser = async function (req, res) {
 
   try {
@@ -80,12 +81,9 @@ const registerUser = async function (req, res) {
 
     if (typeof pincode !== 'string') { return res.status(400).send({ status: false, message: "Pincode should be String" }) }
 
-
-
     const createUser = await userModel.create(requestBody)
 
     res.status(201).send({ status: true, message: 'Success', data: createUser })
-
 
   }
   catch (error) {
@@ -107,9 +105,7 @@ const login = async function (req, res) {
 
     if (!email) { return res.status(400).send({ status: false, message: "email is required" }) }
 
-
     if (!password) { return res.status(400).send({ status: false, message: "Password is require" }) }
-
 
     const user = await userModel.findOne({ email, password })
 
@@ -134,10 +130,8 @@ const login = async function (req, res) {
     res.status(500).send({ status: false, msg: err.message })
 
   }
-
-
-
 }
+
 
 module.exports.registerUser = registerUser
 module.exports.login = login
