@@ -30,7 +30,7 @@ const createReview = async function (req, res) {
 
         if (!isValidRequestBody(data)) return res.status(400).send({ status: false, msg: "data is required in body" })
 
-        const { bookId, reviewedBy, rating, review } = data
+        const { bookId, rating,} = data
 
         if (!isValid(bookId)) return res.status(400).send({ status: false, msg: "bookId should be valid" })
 
@@ -40,8 +40,6 @@ const createReview = async function (req, res) {
             return res.status(400).send({ status: false, msg: "Params bookId and body's bookId are not matching" })
         }
 
-        if (!isValid(reviewedBy)) return res.status(400).send({ status: false, msg: "reviewedBy is required" })
-
         if (!isValid(rating)) return res.status(400).send({ status: false, msg: " rating is required" })
 
         if (rating < 1 || rating > 5) return res.status(400).send({ status: false, msg: "rating should be inbetween 1 and 5" })
@@ -50,18 +48,21 @@ const createReview = async function (req, res) {
 
         if (!bookIdExists) return res.status(404).send({ status: false, msg: "Book is not exist" })
 
-        const reviewsData = await reviewModel.create(data)
+        const reviewData = await reviewModel.create(data)
 
         let reviewCount = await bookModel.findOneAndUpdate({ _id: bookId }, { $inc: { reviews: 1 } })
 
+        let revData = {
+            bookId: reviewData.bookId,
+            reviewedBy: reviewData.reviewedBy,
+            reviewedAt: reviewData.reviewedAt,
+            rating: reviewData.rating,
+            review: reviewData.review
+        }
+        const { ...data1 } = reviewCount
+        data1._doc.reviewsData = revData
         return res.status(201).send({
-            status: true, data: {
-                bookId: reviewsData.bookId,
-                reviewedBy: reviewsData.reviewedBy,
-                reviewedAt: reviewsData.reviewedAt,
-                rating: reviewsData.rating,
-                review: reviewsData.review
-            }
+            status: true, data: data1._doc
         })
 
     } catch (err) {
@@ -197,7 +198,7 @@ const deleteReview = async function (req, res) {
             return res.status(404).send({ status: false, msg: "review does not exist" })
         }
         if (bookId != checkReviewIdExist.bookId) { return res.status(400).send({ status: false, message: "This reviewId not belongs to  bookId" }) }
-        
+
 
         const deletedReview = await reviewModel.findOneAndUpdate(
             { _id: reviewId },
@@ -210,7 +211,7 @@ const deleteReview = async function (req, res) {
             { new: true }
         )
 
-        return res.status(200).send({ status: true, msg: "success" })
+        return res.status(200).send({ status: true, msg: "successfully Deleted" })
 
     } catch (err) {
         return res.status(500).send({ status: false, msg: err.message })

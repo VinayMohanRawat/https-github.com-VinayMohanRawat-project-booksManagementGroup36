@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken')
 const userModel = require("../model/userModel")
 
 const isValid = function (value) {
-  if (typeof value === 'undefine' || value === null) return false
+  if (typeof value === 'undefined' || value === null) return false
   if (typeof value === 'string' && value.trim().length === 0) return false
   return true
 }
@@ -26,9 +26,9 @@ const registerUser = async function (req, res) {
       return res.status(400).send({ status: false, message: "Invalid request parameters. Please provide User details" })
     }
 
-    const { title, name, phone, email, password, address } = requestBody
+    const { title, name, phone, email, password,address } = requestBody
 
-    const { street, city, pincode } = address
+    const{street,city,pincode}=address
     if (!isValid(title)) { return res.status(400).send({ status: false, message: "title is Require" }) }
     if (!isValidTitle(title)) {
       return res.status(400).send({ status: false, message: "Title Should be one of Mr, Mrs, Miss" })
@@ -61,28 +61,10 @@ const registerUser = async function (req, res) {
     }
 
     if (!isValid(password)) { return res.status(400).send({ status: false, message: "Password is require" }) }
-    if (password.length < 8 || password.length > 15) {
+    if (password< 8 || password > 15) {
       return res.status(400).send({ status: false, message: "Password length should not be less than 8 and greater than 15" })
     }
-
-    if (!isValidRequestBody(address)) {
-      return res.status(400).send({ status: false, message: "Please Provide address details" })
-    }
-
-    if (!isValid(street)) { return res.status(400).send({ status: false, message: "Street is Require" }) }
-
-    if (typeof street !== 'string') { return res.status(400).send({ status: false, message: "Street should be String" }) }
-
-    if (!isValid(city)) { return res.status(400).send({ status: false, message: "City is Require" }) }
-
-    if (typeof city !== 'string') { return res.status(400).send({ status: false, message: "City should be String" }) }
-
-    if (!isValid(pincode)) { return res.status(400).send({ status: false, message: "Pincode is Require" }) }
-
-    if (typeof pincode !== 'string') { return res.status(400).send({ status: false, message: "Pincode should be String" }) }
-
-    const createUser = await userModel.create(requestBody)
-
+     let createUser=await userModel.create(requestBody)
     return res.status(201).send({ status: true, message: 'Success', data: createUser })
 
   }
@@ -107,13 +89,9 @@ const login = async function (req, res) {
 
     if (!password) { return res.status(400).send({ status: false, message: "Password is require" }) }
 
-    const user = await userModel.findOne({ email, password })
+    const user = await userModel.findOne({ email,password})
 
-    if (!email) return res.status(404).send({ status: false, msg: "email must be present in body" })
-    if (!password) return res.status(404).send({ status: false, msg: "password must be present in body" })
-
-    if (!user) return res.status(401).send({ status: false, msg: "invalid crendential" })
-
+    if(!user) return res.status(401).send({ status: false, msg: "invalid crendential" })
     const token = jwt.sign({
       userId: user._id,
       iat: Math.floor(Date.now() / 1000),
