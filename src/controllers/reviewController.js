@@ -210,7 +210,7 @@ const deleteReview = async function (req, res) {
             { new: true }
         )
 
-        return res.status(200).send({ status: true, msg: "Updated", data: decreaseReviewValue })
+        return res.status(200).send({ status: true, msg: "success" })
 
     } catch (err) {
         return res.status(500).send({ status: false, msg: err.message })
