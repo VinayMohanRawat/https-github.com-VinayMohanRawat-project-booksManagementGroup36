@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken")
 const mongoose = require('mongoose')
 const booksModel = require("../model/booksModel")
+const userModel = require("../model/userModel")
 
 const validObjectId = function (ObjectId) {
     return mongoose.Types.ObjectId.isValid(ObjectId)
@@ -31,26 +32,35 @@ let authenticateUser = function (req, res, next) {
 
 
 
-let authorizedUser =async  function (req, res, next) {
-            try {
-                let token = req.headers["x-api-key"]
-                let decodedToken = jwt.verify(token, "room_no-36")
-                let bookId = req.params.bookId
-                if (bookId) {
-                    let bookData = await booksModel.findById(bookId).select({ userId: 1 })
-                    userId = bookData.userId
-                    if (userId != decodedToken.userId) {
-                        return res.status(403).send({ status: false, message: "user not authorized" })
-                    }
-                }
-                else {
-                    let userId = req.body.userId
-                    if (decodedToken.userId != userId) {
-                        return res.status(403).send({ status: false, message: "user not authorized " })
-                    }
-                }
-                next()
+let authorizedUser = async function (req, res, next) {
+    try {
+        let token = req.headers["x-api-key"]
+        let decodedToken = jwt.verify(token, "room_no-36")
+        let bookId = req.params.bookId
+        if (bookId) {
+            if (!bookId) { return res.status(400).send({ status: false, message: "user not found" }) }
+
+            let bookData = await booksModel.findById(bookId).select({ userId: 1 })
+            if (!bookData) { return res.status(404).send({ status: false, message: "user not found" }) }
+
+            userId = bookData.userId
+            if (userId != decodedToken.userId) {
+                return res.status(403).send({ status: false, message: "user not authorized" })
             }
+        }
+        else {
+            let userId = req.body.userId
+            if (!userId) { return res.status(400).send({ status: false, message: "userid required" }) }
+
+            let userData = await userModel.findById({ _id: userId }).select({ _id: 1 })
+            if (!userData) { return res.status(404).send({ status: false, message: "user not found" }) }
+
+            if (decodedToken.userId != userId) {
+                return res.status(403).send({ status: false, message: "user not authorized " })
+            }
+        }
+        next()
+    }
     catch (error) {
         res.status(500).send({ status: false, msg: error.message })
     }

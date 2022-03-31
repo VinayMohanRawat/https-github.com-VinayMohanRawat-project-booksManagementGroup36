@@ -116,7 +116,7 @@ const getBooksData = async function (req, res) {
         const bookId = req.params.bookId
         if (!isValid(bookId)) return res.status(400).send({ status: false, msg: "bookid is required" })
 
-        if (!validObjectId(bookId)) return res.status(401).send({ status: false, msg: "invalid bookId" })
+        if (!validObjectId(bookId)) return res.status(400).send({ status: false, msg: "invalid bookId" })
 
         const getBookDetail = await bookModel.findById({ _id: bookId }).select({
             _id: 1, title: 1, excerpt: 1, userId: 1, category: 1, subcategory: 1, deleted: 1,

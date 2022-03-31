@@ -49,12 +49,12 @@ const registerUser = async function (req, res) {
     }
 
     let duplicatePhone = await userModel.findOne({ phone })
-    if (duplicatePhone) { return res.status(401).send({ status: false, message: "phone number already exist" }) }
+    if (duplicatePhone) { return res.status(400).send({ status: false, message: "phone number already exist" }) }
 
 
     if (!isValid(email)) { return res.status(400).send({ status: false, message: "Email is require" }) }
     let duplicateEmail = await userModel.findOne({ email })
-    if (duplicateEmail) { return res.status(401).send({ status: false, message: "email already exist" }) }
+    if (duplicateEmail) { return res.status(400).send({ status: false, message: "email already exist" }) }
 
     if (!(/^\w+([\.-]?\w+)@\w+([\.-]?\w+)(\.\w{2,3})+$/).test(email)) {
       return res.status(400).send({ status: false, message: "Please mention valid Email" })
@@ -83,7 +83,7 @@ const registerUser = async function (req, res) {
 
     const createUser = await userModel.create(requestBody)
 
-    res.status(201).send({ status: true, message: 'Success', data: createUser })
+    return res.status(201).send({ status: true, message: 'Success', data: createUser })
 
   }
   catch (error) {
