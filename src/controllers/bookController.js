@@ -223,7 +223,7 @@ const deleteBook = async function (req, res) {
             return res.status(400).send({ status: false, message: "Invalid bookId." })
         }
 
-        const checkBookIdIsDeleted = await bookModel.findById({ _id: getBookId })
+        const checkBookIdIsDeleted = await bookModel.findOne({ _id: getBookId,isDeleted:false })
 
         if (!checkBookIdIsDeleted) { return res.status(404).send({ status: false, message: `This (${getBookId}) bookId is not exist` }) }
 
