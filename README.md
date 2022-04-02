@@ -320,3 +320,8 @@ Refer below sample
   }
 }
 ```
+
+
+
+{ userId: userId }, { category: category }, { subcategory: subcategory },
+ { userId: userId, category: category, subcategory: subcategory }

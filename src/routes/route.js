@@ -13,15 +13,15 @@ router.post('/login', userController.login);
 
 //-----------------------------------------------------------------------------------------------------------------
 
-router.post('/books', middleware.authenticateUser, middleware.authorizedUser, bookController.createBook)
+router.post('/books', middleware.authenticateUser,bookController.createBook)
 
 router.get('/books', middleware.authenticateUser, bookController.getBooks)
 
 router.get('/books/:bookId', middleware.authenticateUser, bookController.getBooksData)
 
-router.put('/books/:bookId', middleware.authenticateUser, middleware.authorizedUser, bookController.updatedBook)
+router.put('/books/:bookId', middleware.authenticateUser,bookController.updatedBook)
 
-router.delete('/books/:bookId', middleware.authenticateUser, middleware.authorizedUser, bookController.deleteBook)
+router.delete('/books/:bookId', middleware.authenticateUser,bookController.deleteBook)
 
 //------------------------------------------------------------------------------------------------------------------
 

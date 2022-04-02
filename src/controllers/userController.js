@@ -4,6 +4,7 @@ const userModel = require("../model/userModel")
 const isValid = function (value) {
   if (typeof value === 'undefined' || value === null) return false
   if (typeof value === 'string' && value.trim().length === 0) return false
+  if (typeof value === 'number' && value.trim().length === 0) return false
   return true
 }
 
@@ -28,7 +29,7 @@ const registerUser = async function (req, res) {
 
     const { title, name, phone, email, password,address } = requestBody
 
-    const{street,city,pincode}=address
+    
     if (!isValid(title)) { return res.status(400).send({ status: false, message: "title is Require" }) }
     if (!isValidTitle(title)) {
       return res.status(400).send({ status: false, message: "Title Should be one of Mr, Mrs, Miss" })
@@ -61,7 +62,7 @@ const registerUser = async function (req, res) {
     }
 
     if (!isValid(password)) { return res.status(400).send({ status: false, message: "Password is require" }) }
-    if (password< 8 || password > 15) {
+    if (password.length< 8 || password.length> 15) {
       return res.status(400).send({ status: false, message: "Password length should not be less than 8 and greater than 15" })
     }
      let createUser=await userModel.create(requestBody)
@@ -87,11 +88,16 @@ const login = async function (req, res) {
 
     if (!email) { return res.status(400).send({ status: false, message: "email is required" }) }
 
+    if (!(/^\w+([\.-]?\w+)@\w+([\.-]?\w+)(\.\w{2,3})+$/).test(email)) {
+      return res.status(400).send({ status: false, message: "Please mention valid Email" })
+    }
+
     if (!password) { return res.status(400).send({ status: false, message: "Password is require" }) }
 
     const user = await userModel.findOne({ email,password})
 
     if(!user) return res.status(401).send({ status: false, msg: "invalid crendential" })
+
     const token = jwt.sign({
       userId: user._id,
       iat: Math.floor(Date.now() / 1000),

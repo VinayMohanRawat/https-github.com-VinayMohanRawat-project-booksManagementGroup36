@@ -8,6 +8,7 @@ let moment = require("moment")
 const isValid = function (value) {
     if (typeof value === "undefined" || value === null) return false
     if (typeof value === 'string' && value.trim().length === 0) return false
+    if (typeof value === 'number' && value.trim().length === 0) return false
     return true
 }
 
@@ -29,8 +30,8 @@ const createBook = async function (req, res) {
             return res.status(400).send({ status: false, message: "Invalid request parameters. Please provide User details" })
         }
 
-        const { title, excerpt, userId, ISBN, category,reviews, subcategory, releasedAt, } = requestBody
-        
+        const { title, excerpt, userId, ISBN, category, reviews, subcategory, releasedAt, } = requestBody
+
         if (!isValid(title)) { return res.status(400).send({ status: false, message: "Title is required" }) }
 
         let dupTitle = await bookModel.findOne({ title })
@@ -50,6 +51,10 @@ const createBook = async function (req, res) {
             return res.status(404).send({ status: false, message: "User not found in user collection" })
         }
 
+        if (req.userId != userId) {
+            return res.status(403).send({ status: false, message: "User not Authorized" })
+        }
+
         if (!isValid(ISBN)) { return res.status(400).send({ status: false, message: "ISBN is required" }) }
         let dupIsbn = await bookModel.findOne({ ISBN })
         if (dupIsbn) {
@@ -61,9 +66,9 @@ const createBook = async function (req, res) {
 
         if (!isValid(releasedAt)) { return res.status(400).send({ status: false, message: "ReleasedAt is required" }) }
 
-        let date = moment(releasedAt).toISOString()
-        if (!date) { return res.status(400).send({ status: false, message: "not valid date format" }) }
-        const createBook = await bookModel.create({ title, excerpt, userId, ISBN, category, subcategory, reviews, releasedAt: date })
+        
+        if (!(/^\d{4}-\d{2}-\d{2}$/.test(releasedAt))) { return res.status(400).send({ status: false, message: "not valid date format" }) }
+        const createBook = await bookModel.create({ title, excerpt, userId, ISBN, category, subcategory, reviews, releasedAt })
 
         res.status(201).send({ status: true, message: 'Success', data: createBook })
 
@@ -89,14 +94,22 @@ const getBooks = async function (req, res) {
             return res.status(200).send({ status: true, data: booksNotDeleted })
         }
 
-        const books = await bookModel
-            .find({
-                isDeleted: false, $or: [{ userId: userId, category: category },
-                { userId: userId, subcategory: subcategory },
-                { category: category, subcategory: subcategory }]
-            })
-            .select({ _id: 1, title: 1, excerpt: 1, userId: 1, category: 1, releasedAt: 1, reviews: 1 })
-            .sort({ title: 1 })
+        const filter = { isDeleted: false }
+        if (isValid(userId) && validObjectId(userId)) {
+            filter.userId = userId
+        }
+
+        if (isValid(category)) {
+            filter.category = category
+
+        }
+
+        if (isValid(subcategory)) {
+            filter.subcategory = subcategory
+        }
+
+
+        const books = await bookModel.find(filter).select({ _id: 1, title: 1, excerpt: 1, userId: 1, category: 1, reviews: 1, releasedAt: 1 }).sort({ title: 1 })
 
 
         if (Array.isArray(books) && books.length === 0) {
@@ -108,6 +121,8 @@ const getBooks = async function (req, res) {
         res.status(500).send({ status: false, msg: err.message })
     }
 }
+
+
 
 const getBooksData = async function (req, res) {
     try {
@@ -152,6 +167,11 @@ let updatedBook = async function (req, res) {
         let bookData = await bookModel.findOne({ _id: bookId, isDeleted: false })
         if (!bookData) { return res.status(404).send({ status: false, message: "BookData not found in the collection" }) }
 
+        let userId = bookData.userId
+        if (req.userId != userId) {
+            return res.status(403).send({ status: false, message: "User not Authorized" })
+        }
+
         const { title, excerpt, releasedAt, ISBN } = data
         let updatedData = {}
         if (!isValidRequestBody(data)) { return res.status(400).send({ status: false, message: "Enter valid parameters" }) }
@@ -180,8 +200,9 @@ let updatedBook = async function (req, res) {
             if (!isValid(releasedAt)) {
                 return res.status(400).send({ status: false, msg: "releasedAt is not in valid format" })
             }
-            let date = moment(releasedAt).toISOString()
-            if (!date) { return res.status(400).send({ status: false, message: "not valid date format" }) }
+            if (!(/^\d{4}-\d{2}-\d{2}$/.test(releasedAt))) {
+                 return res.status(400).send({ status: false, message: "not valid date format" }) 
+                }
 
             updatedData['releasedAt'] = releasedAt
         }
@@ -223,9 +244,14 @@ const deleteBook = async function (req, res) {
             return res.status(400).send({ status: false, message: "Invalid bookId." })
         }
 
-        const checkBookIdIsDeleted = await bookModel.findOne({ _id: getBookId,isDeleted:false })
+        const checkBookIdIsDeleted = await bookModel.findOne({ _id: getBookId, isDeleted: false })
 
         if (!checkBookIdIsDeleted) { return res.status(404).send({ status: false, message: `This (${getBookId}) bookId is not exist` }) }
+
+        let userId = checkBookIdIsDeleted.userId
+        if (req.userId != userId) {
+            return res.status(403).send({ status: false, message: "User not Authorized" })
+        }
 
         const bookIdDeleted = await bookModel.findByIdAndUpdate(getBookId, { isDeleted: true, deletedAt: deletedDate })
 

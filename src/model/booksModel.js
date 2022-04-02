@@ -1,6 +1,5 @@
 const mongoose = require('mongoose')
-const validator = require('validator');
-let moment = require("moment")
+
 
 
 const booksSchema = new mongoose.Schema({
@@ -48,7 +47,7 @@ const booksSchema = new mongoose.Schema({
     },
 
     releasedAt: {
-        type: Date,
+        type: String,
         required: true,
         trim: true
     }
